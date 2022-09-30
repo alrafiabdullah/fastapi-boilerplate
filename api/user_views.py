@@ -30,12 +30,15 @@ def create_user(db: Session, user: UserSchema):
 
 
 def update_user(db: Session, user: UserSchema):
-    db_user = db.query(User).filter(User.id == user.id).first()
-    db_user.full_name = user.full_name
-    db_user.email = user.email
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    try:
+        db_user = db.query(User).filter(User.id == user.id).first()
+        db_user.full_name = user.full_name
+        db_user.email = user.email
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except:
+        return None
 
 
 def delete_user(db: Session, user_id: int):
