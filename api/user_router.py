@@ -88,9 +88,6 @@ async def user_login(request: RequestLogin, db: Session = Depends(get_db)):
         if user is None:
             return JSONResponse(
                 status_code=status.HTTP_404_NOT_FOUND, content={"data": "User not found"})
-        print(password_check(request.parameter.password, user.password))
-        print(user.password)
-        print(request.parameter.password)
         if password_check(request.parameter.password, user.password):
             user.password = None
             return Response(data=user, message="User login successfully", code=status.HTTP_200_OK)
