@@ -12,8 +12,8 @@ def get_user(db: Session, skip: int = 0, limit: int = 100):
     return db.query(User).offset(skip).limit(limit).all()
 
 
-def get_user_by_id(db: Session, user_id: int):
-    return db.query(User).filter(User.id == user_id).first()
+def get_user_by_email(db: Session, email: str):
+    return db.query(User).filter(User.email == email).first()
 
 
 def create_user(db: Session, user: UserSchema):
@@ -31,7 +31,7 @@ def create_user(db: Session, user: UserSchema):
 
 def update_user(db: Session, user: UserSchema):
     try:
-        db_user = db.query(User).filter(User.id == user.id).first()
+        db_user = db.query(User).filter(User.email == user.email).first()
         db_user.full_name = user.full_name
         db_user.email = user.email
         db.commit()
@@ -49,3 +49,12 @@ def delete_user(db: Session, user_id: int):
         return db_user
     except:
         return None
+
+
+def password_check(plain_password, hashed_password):
+    try:
+        if not hasher_obj.verify_password(plain_password, hashed_password):
+            return False
+        return True
+    except:
+        return False
