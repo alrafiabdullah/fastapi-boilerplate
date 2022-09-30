@@ -6,7 +6,7 @@
 
 - Create and activate a virtual environment
 - Run `pip3 install -r requirements.txt`
-- Create a .env file in the root directory of the project and copy the following:
+- Create a `.env` file in the root directory of the project and copy the following:
 
 ```
 PG_USER=
