@@ -9,4 +9,5 @@ def read_root():
     return {"Hello": "World"}
 
 
-uvicorn.run(app, port=8000)
+if __name__ == "__main__":
+    uvicorn.run(app, port=8000)
