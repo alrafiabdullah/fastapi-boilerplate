@@ -37,7 +37,7 @@ async def user_get_by_(email: str, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.post("/create")
+@router.post("/register")
 async def user_create(request: RequestUser, db: Session = Depends(get_db)):
     try:
         user = create_user(db, request.parameter)
