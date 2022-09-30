@@ -3,8 +3,8 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from db.config import SessionLocal, get_db
-from db.schema import UserSchema, RequestUser, Response
-from api.user_views import get_user, get_user_by_id, create_user, update_user, delete_user
+from db.schema import UserSchema, RequestUser, Response, RequestLogin
+from api.user_views import get_user, get_user_by_email, create_user, update_user, delete_user, password_check
 
 router = APIRouter()
 
@@ -22,10 +22,10 @@ async def user_get(db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.get("/{user_id}")
-async def user_get_by_id(user_id: int, db: Session = Depends(get_db)):
+@router.get("/{email}")
+async def user_get_by_(email: str, db: Session = Depends(get_db)):
     try:
-        user = get_user_by_id(db, user_id)
+        user = get_user_by_email(db, email)
         if user is None:
             return JSONResponse(
                 status_code=status.HTTP_404_NOT_FOUND, content={"data": "User not found"})
@@ -76,6 +76,27 @@ async def user_delete(request: RequestUser, db: Session = Depends(get_db)):
                 status_code=status.HTTP_404_NOT_FOUND, content={"data": "User not found"})
 
         return JSONResponse(status_code=status.HTTP_200_OK, content={"status": "SUCCESS", "data": "User deleted successfully"})
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.post("/login")
+async def user_login(request: RequestLogin, db: Session = Depends(get_db)):
+    try:
+        user = get_user_by_email(db, request.parameter.email)
+        if user is None:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND, content={"data": "User not found"})
+        print(password_check(request.parameter.password, user.password))
+        print(user.password)
+        print(request.parameter.password)
+        if password_check(request.parameter.password, user.password):
+            user.password = None
+            return Response(data=user, message="User login successfully", code=status.HTTP_200_OK)
+        else:
+            return JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED, content={"data": "Incorrect username/password"})
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
