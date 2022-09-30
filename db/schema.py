@@ -22,7 +22,15 @@ class Request(GenericModel, Generic[T]):
 class RequestUser(BaseModel):
     parameter: UserSchema = Field(..., example={
         "full_name": "Abdullah Al Rafi",
-        "email": "abdullah@al.com"
+        "email": "abdullah@al.com",
+        "password": "123456"
+    })
+
+
+class RequestLogin(BaseModel):
+    parameter: UserSchema = Field(..., example={
+        "email": "abdullah@al.com",
+        "password": "123456",
     })
 
 
