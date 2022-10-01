@@ -3,8 +3,8 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from db.config import SessionLocal, get_db
-from db.schema import UserSchema, RequestUser, Response, RequestLogin
-from api.user_views import get_user, get_user_by_email, create_user, update_user, delete_user, password_check
+from db.schema import UserSchema, RequestUser, Response, RequestLogin, RequestChangePassword
+from api.user_views import get_user, get_user_by_email, create_user, update_user, delete_user, password_check, update_user_password
 
 router = APIRouter()
 
@@ -94,6 +94,28 @@ async def user_login(request: RequestLogin, db: Session = Depends(get_db)):
         else:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED, content={"data": "Incorrect username/password"})
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.post("/change/password")
+async def user_change_password(request: RequestChangePassword, db: Session = Depends(get_db)):
+    try:
+        if request.parameter.new_password != request.parameter.confirm_password:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST, content={"data": "New password and confirm password does not match"})
+
+        user = get_user_by_email(db, request.parameter.email)
+        if user is None:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND, content={"data": "User not found"})
+
+        if password_check(request.parameter.password, user.password):
+            update_user_password(db, user, request.parameter.new_password)
+            return JSONResponse(status_code=status.HTTP_200_OK, content={"data": "Password changed successfully"})
+
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={"data": "Incorrect old password"})
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
