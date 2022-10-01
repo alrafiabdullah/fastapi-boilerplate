@@ -10,6 +10,8 @@ class UserSchema(BaseModel):
     full_name: Optional[str] = None
     email: Optional[str] = None
     password: Optional[str] = None
+    new_password: Optional[str] = None
+    confirm_password: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -31,6 +33,15 @@ class RequestLogin(BaseModel):
     parameter: UserSchema = Field(..., example={
         "email": "abdullah@al.com",
         "password": "123456",
+    })
+
+
+class RequestChangePassword(BaseModel):
+    parameter: UserSchema = Field(..., example={
+        "email": "abdullah@al.com",
+        "password": "123456",
+        "new_password": "1234567",
+        "confirm_password": "1234567",
     })
 
 
