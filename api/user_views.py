@@ -41,6 +41,17 @@ def update_user(db: Session, user: UserSchema):
         return None
 
 
+def update_user_password(db: Session, user: UserSchema, password: str):
+    try:
+        db_user = db.query(User).filter(User.email == user.email).first()
+        db_user.password = hasher_obj.get_password_hash(password)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except:
+        return None
+
+
 def delete_user(db: Session, user_id: int):
     try:
         db_user = db.query(User).filter(User.id == user_id).first()
